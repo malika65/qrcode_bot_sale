@@ -77,3 +77,16 @@ class Stock(models.Model):
     
     def __str__(self):
         return self.name
+
+import uuid
+
+class Subscriber(models.Model):
+    sub_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    username = models.CharField(max_length=200,verbose_name='Имя',null=True,blank=True)
+
+    class Meta:
+        verbose_name = 'Подписчик'
+        verbose_name_plural = 'Подписчики'
+    
+    def __str__(self):
+        return self.username

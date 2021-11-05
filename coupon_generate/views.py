@@ -6,7 +6,7 @@ from telebot import TeleBot, types
 from io import BytesIO
 
 from .buttons import category, subscribe, menu, gen_coupon_menu, get_coupon_kb
-from .models import Organization, QRCode, Stock
+from .models import Organization, QRCode, Stock, Subscriber
 from .utils import generate_qrcode
 
 # creating Telebot instance 
@@ -36,6 +36,8 @@ def send_welcome(message):
 
     bot.send_message(message.chat.id, want_msg, reply_markup=subscribe, parse_mode='HTML')
 
+# from django.utils.timezone import datetime #important if using timezones
+import datetime 
 
 # decorator for handling callback data from buttons
 @bot.callback_query_handler(func=lambda call: True)
@@ -46,8 +48,33 @@ def handle_query(call):
         
         # here we need to send all new coupons and stocks to the subscribe users 
         elif call.data == 'subscribe':
+            subscribe = Subscriber.objects.create(sub_id=call.from_user.id,username=call.from_user.first_name)
+            subscribe.save()
+
             bot.send_message(call.message.chat.id,'<pre>Спасибо за доверие 🙏. Теперь вы будете одним из первых получать уведомления о самых свежих купонах и акциях 🤑.</pre>\n\nДля того чтобы отменить подписку напишите /unsubscribe', reply_markup=menu, parse_mode='HTML')
-        
+        # callback for newest stocks and qrcodes
+        elif call.data == 'fire':
+            stock = Stock.objects.all()
+            qrcode = QRCode.objects.all()
+            
+            try:
+                for i in stock:
+                    # check if stock experation day is nearby
+                    if (i.expiration_date - datetime.timedelta(days=7)).day <= 7:
+                        bot.send_message(call.message.chat.id,f'<strong>{i.name}</strong>\n<pre>{i.description}</pre>\nДата окончания акции: {i.expiration_date.strftime("%Y-%m-%d %H:%M")}', parse_mode='HTML')
+            except Exception as e :
+                print(e)
+                bot.send_message(call.message.chat.id,'На данный момент у нас нет горящих акций, у которых срок действия неделя или меньше. Следите за обновлениями😉', parse_mode='HTML', reply_markup = menu)
+            
+            try:
+                for j in qrcode:
+                    # check if qrcode experation day is nearby
+                    if (j.expiration_date - datetime.timedelta(days=7)).day <= 7:
+                        bot.send_message(call.message.chat.id,f'<strong>{j.name}</strong>\n<pre>{j.description}</pre>\nДата окончания акции: {j.expiration_date.strftime("%Y-%m-%d %H:%M")}', parse_mode='HTML', reply_markup = get_coupon_kb(j.id))
+            except Exception as e :
+                bot.send_message(call.message.chat.id,'На данный момент у нас нет горящих акций, у которых срок действия неделя или меньше. Следите за обновлениями😉', parse_mode='HTML', reply_markup = menu)
+
+
         elif call.data.split('_')[0] == 'coupon':
             # get all coupons of specific organization found by organization_id
             coupons = QRCode.objects.filter(organization_id = call.data.split('_')[1])
@@ -103,3 +130,19 @@ def handle_query(call):
 
     except Exception as e:
         print(e)
+
+# decorator to react on unsubscribe command
+@bot.message_handler(commands=['unsubscribe'])
+def send_welcome(message):
+    try:
+        unsubscribe = Subscriber.objects.filter(sub_id=message.chat.id)
+        unsubscribe.delete()
+    except BaseException as e:
+        msg = "Вы не подписаны на этого бота"
+        bot.send_message(message.chat.id, msg, parse_mode='HTML')
+    
+    msg = "Вы успешно отписались от бота."
+
+    bot.send_message(message.chat.id, msg, parse_mode='HTML')
+
+
