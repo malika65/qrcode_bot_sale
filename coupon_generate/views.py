@@ -50,10 +50,13 @@ def handle_query(call):
         
         # here we need to send all new coupons and stocks to the subscribe users 
         elif call.data == 'subscribe':
-            subscribe = Subscriber.objects.create(sub_id=call.from_user.id,username=call.from_user.first_name)
-            subscribe.save()
-
-            bot.send_message(call.message.chat.id,'<pre>Спасибо за доверие 🙏. Теперь вы будете одним из первых получать уведомления о самых свежих купонах и акциях 🤑.</pre>\n\nДля того чтобы отменить подписку напишите /unsubscribe', reply_markup=menu, parse_mode='HTML')
+            if Subscriber.objects.filter(sub_id=call.from_user.id)[0]:
+                bot.send_message(call.message.chat.id,'Вы уже подписаны на бота Big Coupon', reply_markup=menu, parse_mode='HTML')
+            else:
+                subscribe = Subscriber.objects.create(sub_id=call.from_user.id,username=call.from_user.first_name)
+                subscribe.save()
+                bot.send_message(call.message.chat.id,'<pre>Спасибо за доверие 🙏. Теперь вы будете одним из первых получать уведомления о самых свежих купонах и акциях 🤑.</pre>\n\nДля того чтобы отменить подписку напишите /unsubscribe', reply_markup=menu, parse_mode='HTML')
+        
         # callback for newest stocks and qrcodes
         elif call.data == 'fire':
             stock = Stock.objects.all()
@@ -65,7 +68,6 @@ def handle_query(call):
                     if (i.expiration_date - datetime.timedelta(days=7)).day <= 7:
                         bot.send_message(call.message.chat.id,f'<strong>{i.name}</strong>\n<pre>{i.description}</pre>\nДата окончания акции: {i.expiration_date.strftime("%Y-%m-%d %H:%M")}', parse_mode='HTML')
             except Exception as e :
-                print(e)
                 bot.send_message(call.message.chat.id,'На данный момент у нас нет горящих акций, у которых срок действия неделя или меньше. Следите за обновлениями😉', parse_mode='HTML', reply_markup = menu)
             
             try:
