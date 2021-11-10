@@ -3,3 +3,4 @@ qrcode==7.3.1
 django-rest-framework==0.1.0
 djangorestframework==3.12.4
 python-decouple==3.5
+whitenoise==5.2.0
