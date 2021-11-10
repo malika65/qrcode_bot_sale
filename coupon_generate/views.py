@@ -9,6 +9,9 @@ from .buttons import category, subscribe, menu, gen_coupon_menu, get_coupon_kb
 from .models import Organization, QRCode, Stock, Subscriber
 from .utils import generate_qrcode
 
+# from django.utils.timezone import datetime #important if using timezones
+import datetime 
+
 # creating Telebot instance 
 bot = TeleBot(settings.TOKEN)
 
@@ -36,8 +39,7 @@ def send_welcome(message):
 
     bot.send_message(message.chat.id, want_msg, reply_markup=subscribe, parse_mode='HTML')
 
-# from django.utils.timezone import datetime #important if using timezones
-import datetime 
+
 
 # decorator for handling callback data from buttons
 @bot.callback_query_handler(func=lambda call: True)
@@ -144,5 +146,3 @@ def send_welcome(message):
     msg = "Вы успешно отписались от бота."
 
     bot.send_message(message.chat.id, msg, parse_mode='HTML')
-
-

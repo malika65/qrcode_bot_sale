@@ -1,5 +1,6 @@
 from django.db import models
 
+
 BEAUTY  = 'BEAUTY'
 HEALTH  = 'HEALTH'
 CAFE = 'CAFE'
@@ -28,6 +29,7 @@ CATEGORY_CHOICES = [
     (DIFFERENT, 'Разное'),
 ]
 
+
 class Organization(models.Model):
     name = models.CharField(max_length=200,verbose_name='Название',null=True,blank=True)
     pic = models.ImageField(upload_to = 'images/organization', null = True, blank=True)
@@ -54,6 +56,19 @@ class QRCode(models.Model):
     expiration_date = models.DateTimeField('Время окончания qrкода')
     organization = models.ForeignKey(Organization,null=True,blank=True,on_delete=models.CASCADE)
 
+    def save(self, *args, **kwargs):
+        # import inside method to prevent circular import in file
+        from .views import bot
+        from .buttons import get_coupon_kb
+        
+        # first save and before use self.id
+        super(QRCode, self).save(*args, **kwargs)
+
+        users = Subscriber.objects.all()
+        for user in users:
+            print(self.pk)
+            bot.send_message(user.sub_id, text=f'{self.name}\n{self.description}\nДень окончания акции: {self.expiration_date.strftime("%Y-%m-%d %H:%M")}', reply_markup = get_coupon_kb(self.id))
+        
 
     class Meta:
         verbose_name = 'QRкод'
@@ -70,7 +85,18 @@ class Stock(models.Model):
     expiration_date = models.DateTimeField('Время окончания акции')
     organization = models.ForeignKey(Organization,null=True,blank=True,on_delete=models.CASCADE)
 
+    def save(self, *args, **kwargs):
+        # import inside method to prevent circular import in file
+        from .views import bot
+        
+        # first save and before use self.id
+        super(Stock, self).save(*args, **kwargs)
 
+        users = Subscriber.objects.all()
+        for user in users:
+            print(self.pk)
+            bot.send_message(user.sub_id, text=f'{self.name}\n{self.description}\nДень окончания акции: {self.expiration_date.strftime("%Y-%m-%d %H:%M")}')
+       
     class Meta:
         verbose_name = 'Акция'
         verbose_name_plural = 'Акции'
@@ -78,10 +104,11 @@ class Stock(models.Model):
     def __str__(self):
         return self.name
 
-import uuid
+
+
 
 class Subscriber(models.Model):
-    sub_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sub_id = models.AutoField(primary_key = True)
     username = models.CharField(max_length=200,verbose_name='Имя',null=True,blank=True)
 
     class Meta:

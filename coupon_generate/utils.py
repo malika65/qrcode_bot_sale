@@ -1,6 +1,5 @@
 import qrcode 
 
-
 def generate_qrcode(description):
 
     qr = qrcode.QRCode(
@@ -16,3 +15,4 @@ def generate_qrcode(description):
     img = qr.make_image(fill='block',back_color='white')
     
     return img
+
