@@ -50,7 +50,7 @@ def handle_query(call):
         
         # here we need to send all new coupons and stocks to the subscribe users 
         elif call.data == 'subscribe':
-            if Subscriber.objects.filter(sub_id=call.from_user.id)[0]:
+            if Subscriber.objects.filter(sub_id=call.from_user.id):
                 bot.send_message(call.message.chat.id,'Вы уже подписаны на бота Big Coupon', reply_markup=menu, parse_mode='HTML')
             else:
                 subscribe = Subscriber.objects.create(sub_id=call.from_user.id,username=call.from_user.first_name)
