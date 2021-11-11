@@ -128,6 +128,7 @@ def handle_query(call):
                 try:
                     bot.send_photo(call.message.chat.id, photo=i.pic,caption=f'<strong>{i.name}</strong>\n<pre>{i.description}</pre>', parse_mode='HTML', reply_markup= gen_coupon_menu(i.id))
                 except BaseException as e :
+                    bot.send_message(call.message.chat.id, f'{e}', parse_mode='HTML')
                     bot.send_photo(call.message.chat.id, photo='shorturl.at/dpIKL',caption=f'<strong>{i.name}</strong>\n<pre>{i.description}</pre>', parse_mode='HTML', reply_markup= gen_coupon_menu(i.id))
             
             bot.send_message(call.message.chat.id,'Только у нас вы найдете новейшие акции и купоны', reply_markup = menu)
