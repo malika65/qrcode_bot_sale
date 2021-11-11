@@ -143,14 +143,14 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 
-STATIC_URL = '/static/'
-
 #location where django collect all static files
 STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
 
-# location where you will store your static files
-STATICFILES_DIRS = [os.path.join(BASE_DIR,'static')
-]
+STATIC_URL = '/static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+# location where you will store your static files
+STATIC_DIRS = [
+   ]
+
 MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
