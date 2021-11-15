@@ -64,4 +64,4 @@ After this steps bot should work.
 
 For administrating your bot go to  `http://127.0.0.1:8000/` and create objects for your models.
 
-[Documentation for code](../tree/master/documentation)
+[Documentation for code](../qrcode_bot_sale/tree/master/documentation)
