@@ -59,9 +59,11 @@ def handle_query(call):
         
         # callback for newest stocks and qrcodes
         elif call.data == 'fire':
-            stock = Stock.objects.all()
-            qrcode = QRCode.objects.all()
-            
+            try:
+                stock = Stock.objects.all()
+                qrcode = QRCode.objects.all()
+            except Exception as e:
+                bot.send_message(call.message.chat.id,f'{e}')
             try:
                 for i in stock:
                     # check if stock experation day is nearby
