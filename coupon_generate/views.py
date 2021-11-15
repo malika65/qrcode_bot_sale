@@ -59,15 +59,13 @@ def handle_query(call):
         
         # callback for newest stocks and qrcodes
         elif call.data == 'fire':
-            try:
-                stock = Stock.objects.all()
-                qrcode = QRCode.objects.all()
-            except Exception as e:
-                bot.send_message(call.message.chat.id,f'{e}')
+            stock = Stock.objects.all()
+            qrcode = QRCode.objects.all()
+                
             try:
                 for i in stock:
                     # check if stock experation day is nearby
-                    if (i.expiration_date - datetime.timedelta(days=7)).day <= 7:
+                    if (i.expiration_date - datetime.timedelta(days=datetime.date.today().day)).day <= 7:
                         bot.send_message(call.message.chat.id,f'<strong>{i.name}</strong>\n<pre>{i.description}</pre>\nДата окончания акции: {i.expiration_date.strftime("%Y-%m-%d %H:%M")}', parse_mode='HTML')
             except Exception as e :
                 bot.send_message(call.message.chat.id,'На данный момент у нас нет горящих акций, у которых срок действия неделя или меньше. Следите за обновлениями😉', parse_mode='HTML', reply_markup = menu)
@@ -75,7 +73,7 @@ def handle_query(call):
             try:
                 for j in qrcode:
                     # check if qrcode experation day is nearby
-                    if (j.expiration_date - datetime.timedelta(days=7)).day <= 7:
+                    if (j.expiration_date - datetime.timedelta(days=datetime.date.today().day)).day <= 7:
                         bot.send_message(call.message.chat.id,f'<strong>{j.name}</strong>\n<pre>{j.description}</pre>\nДата окончания акции: {j.expiration_date.strftime("%Y-%m-%d %H:%M")}', parse_mode='HTML', reply_markup = get_coupon_kb(j.id))
             except Exception as e :
                 bot.send_message(call.message.chat.id,'На данный момент у нас нет горящих акций, у которых срок действия неделя или меньше. Следите за обновлениями😉', parse_mode='HTML', reply_markup = menu)
