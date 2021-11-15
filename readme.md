@@ -58,8 +58,7 @@ Next step is setting webhooks:
     Ngrok will give you links. Copy link with https protocol. Ngrok will get all requests from bot and receive it to you.
 
     To set up webhooks you need to go to the browser and put this link there. At the end you need to put tou ngrok link. 
-    
-    [link text itself]:https://api.telegram.org/bot2063722420:AAEenPwY039CzQNLgO-mFmG2IDuDhGLU0Is/setWebhook?url=YOUR_NGROK_LINK
+    https://api.telegram.org/bot2063722420:AAEenPwY039CzQNLgO-mFmG2IDuDhGLU0Is/setWebhook?url=YOUR_NGROK_LINK
 
 After this steps bot should work.
 
